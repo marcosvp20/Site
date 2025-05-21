@@ -1,0 +1,39 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f5f5f5;
+}
+
+h1 {
+  text-align: center;
+}
+
+.config {
+  margin: 20px 0;
+}
+
+.config label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+#drop-area {
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  margin-bottom: 20px;
+  background-color: #fff;
+}
+
+#drop-area.hover {
+  border-color: #333;
+  color: #333;
+}
+
+.output {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+}

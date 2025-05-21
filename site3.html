@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Configuração BLE + OTA</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Sensor LoRa BLE</h1>
+
+  <button id="connectBtn">Conectar ao Sensor</button>
+
+  <div class="config">
+    <label>SSID: <input type="text" id="ssid" /></label>
+    <label>Senha: <input type="password" id="password" /></label>
+    <label>Spread Factor: <input type="number" id="sf" min="7" max="12" /></label>
+    <label>Taxa de Amostragem (ms): <input type="number" id="sampleRate" min="100" /></label>
+    <button id="sendConfigBtn">Enviar Configurações</button>
+  </div>
+
+  <div id="drop-area">
+    <p>Arraste o arquivo .bin aqui para atualização OTA</p>
+  </div>
+
+  <div class="output">
+    <h2>Dados do Sensor</h2>
+    <pre id="sensorData"></pre>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
