@@ -62,9 +62,9 @@
         service = await gattServer.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
 
         // Características
-        redeChar = await service.getCharacteristic('abcd0001-1234-5678-90ab-cdef12345678');
-        rssiChar = await service.getCharacteristic('abcd0002-1234-5678-90ab-cdef12345678');
-        medidaChar = await service.getCharacteristic('abcd0003-1234-5678-90ab-cdef12345678');
+        redeChar = await service.getCharacteristic('abcd0001-0000-0000-0000-000000000001');
+        rssiChar = await service.getCharacteristic('abcd0007-0000-0000-0000-000000000007');
+        medidaChar = await service.getCharacteristic('abcd0005-0000-0000-0000-000000000005');
 
         atualizarDados();
         setInterval(atualizarDados, 2000); // atualiza a cada 2s
