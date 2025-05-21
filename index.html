@@ -50,6 +50,7 @@
 
     function handleNotifications(event) {
       const value = new TextDecoder().decode(event.target.value);
+      console.log("dado recebido do esp", value);
       document.getElementById('receivedData').textContent = value;
     }
   </script>
