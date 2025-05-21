@@ -1,90 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Sensor LoRa via BLE</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f0f2f5;
-    }
-    h1 {
-      color: #333;
-    }
-    #info {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      max-width: 600px;
-    }
-    button {
-      padding: 10px 20px;
-      margin-top: 10px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .label {
-      font-weight: bold;
-      margin-top: 10px;
-      display: block;
-    }
-  </style>
+  <meta charset="utf-8">
+  <title>ESP32 BLE Site</title>
 </head>
 <body>
-  <h1>Sensor LoRa - Interface Web Bluetooth</h1>
+  <h2>Conectar ao ESP32</h2>
+  <button onclick="connectBLE()">Conectar</button>
 
-  <div id="info">
-    <button onclick="connectDevice()">Conectar ao Sensor</button>
+  <h3>Enviar dado para ESP32:</h3>
+  <input type="text" id="inputData" placeholder="Digite algo">
+  <button onclick="sendData()">Enviar</button>
 
-    <div id="dados" style="margin-top:20px;">
-      <span class="label">Rede Detectada:</span> <span id="rede">-</span><br>
-      <span class="label">Potência do Sinal (RSSI):</span> <span id="rssi">-</span><br>
-      <span class="label">Valor Medido:</span> <span id="medida">-</span>
-    </div>
-  </div>
+  <h3>Dado recebido do ESP32:</h3>
+  <pre id="receivedData">---</pre>
 
   <script>
-    let device;
-    let gattServer;
-    let service;
-    let redeChar, rssiChar, medidaChar;
+    let bleServer;
+    let bleCharacteristic;
 
-    async function connectDevice() {
+    const serviceUuid = '0000ffe0-0000-1000-8000-00805f9b34fb';   // Serviço
+    const charUuid    = '0000ffe1-0000-1000-8000-00805f9b34fb';   // Característica (leitura + escrita)
+
+    async function connectBLE() {
       try {
-        device = await navigator.bluetooth.requestDevice({
-          acceptAllDevices: true,
-          optionalServices: ['12345678-1234-1234-1234-1234567890ab'] // coloque o UUID real do seu serviço BLE aqui
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ services: [serviceUuid] }]
         });
 
-        gattServer = await device.gatt.connect();
-        service = await gattServer.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(serviceUuid);
+        bleCharacteristic = await service.getCharacteristic(charUuid);
 
-        // Características
-        redeChar = await service.getCharacteristic('abcd0001-0000-0000-0000-000000000001');
-        rssiChar = await service.getCharacteristic('abcd0007-0000-0000-0000-000000000007');
-        medidaChar = await service.getCharacteristic('abcd0005-0000-0000-0000-000000000005');
+        // Habilita notificação para receber dados
+        await bleCharacteristic.startNotifications();
+        bleCharacteristic.addEventListener('characteristicvaluechanged', handleNotifications);
 
-        atualizarDados();
-        setInterval(atualizarDados, 2000); // atualiza a cada 2s
+        document.getElementById('receivedData').textContent = "Conectado! Aguardando dados...";
       } catch (error) {
-        console.error('Erro ao conectar:', error);
+        console.error("Erro ao conectar:", error);
       }
     }
 
-    async function atualizarDados() {
-      if (!redeChar || !rssiChar || !medidaChar) return;
+    function sendData() {
+      const text = document.getElementById('inputData').value;
+      const encoder = new TextEncoder();
+      bleCharacteristic.writeValue(encoder.encode(text));
+    }
 
-      const redeVal = await redeChar.readValue();
-      const rssiVal = await rssiChar.readValue();
-      const medidaVal = await medidaChar.readValue();
-
-      const dec = decoder => new TextDecoder().decode(decoder);
-
-      document.getElementById('rede').textContent = dec(redeVal);
-      document.getElementById('rssi').textContent = rssiVal.getInt8(0) + ' dBm';
-      document.getElementById('medida').textContent = dec(medidaVal);
+    function handleNotifications(event) {
+      const value = new TextDecoder().decode(event.target.value);
+      document.getElementById('receivedData').textContent = value;
     }
   </script>
 </body>
